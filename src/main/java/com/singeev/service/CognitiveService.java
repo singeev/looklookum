@@ -11,6 +11,7 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,28 +24,24 @@ public class CognitiveService {
     private final static Logger LOGGER = LoggerFactory.getLogger(CognitiveService.class);
 
     public List<DetectedFace> lookAtThePhoto(String photoUrl) {
-        HttpClient httpclient = HttpClients.createDefault();
+        final HttpClient httpclient = HttpClients.createDefault();
 
         try {
-            URIBuilder builder = new URIBuilder("https://westeurope.api.cognitive.microsoft.com/face/v1.0/detect");
+            URI uri = new URIBuilder(Properties.getProperty("faceApiEndPoint"))
+                    .setParameter("returnFaceId", "true")
+                    .setParameter("returnFaceLandmarks", "false")
+                    .setParameter("returnFaceAttributes", "age,gender,smile,emotion")
+                    .build();
 
-            builder.setParameter("returnFaceId", "true");
-            builder.setParameter("returnFaceLandmarks", "false");
-            builder.setParameter("returnFaceAttributes", "age,gender,smile,emotion");
-
-            URI uri = builder.build();
             HttpPost request = new HttpPost(uri);
             request.setHeader("Content-Type", "application/json");
-            request.setHeader("Ocp-Apim-Subscription-Key", "320e589da30a4f0eb87d3a54e71b8105");
+            request.setHeader("Ocp-Apim-Subscription-Key", Properties.getProperty("msAzureSubscriptionKey"));
 
-
-            // Request body
-            String body = "{\n" +
-                    "    \"url\": \"" + photoUrl + "\"\n" +
-                    "}";
-            StringEntity reqEntity = new StringEntity(body);
+            JSONObject body = new JSONObject().put("url", photoUrl);
+            StringEntity reqEntity = new StringEntity(body.toString());
             request.setEntity(reqEntity);
 
+            LOGGER.info("Sending photo to Azure service...");
             HttpResponse response = httpclient.execute(request);
             HttpEntity entity = response.getEntity();
 

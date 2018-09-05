@@ -8,9 +8,9 @@ import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-public class App {
+public class MainApp {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(App.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(MainApp.class);
 
     public static void main(String[] args) {
         Properties.loadProperties();
